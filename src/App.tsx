@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 
 /* ============================================================
    CONFIGURAÇÃO — edite aqui os dados da empresa (usados nas páginas)
@@ -478,8 +478,15 @@ const Brand = ({ size = 18 }) => (
 
 const Pill = ({ c, children }) => <span className={`pill ${c}`}>{children}</span>;
 
+interface FieldProps {
+  label: string;
+  error?: string;
+  span2?: boolean;
+  children: React.ReactNode;
+}
+
 /* Campo de formulário — definido FORA dos formulários (evita perder o foco a cada tecla) */
-function Field({ label, error, span2, children }) {
+function Field({ label, error, span2, children }: FieldProps) {
   return (
     <div className={`fg2 ${span2 ? "span2" : ""}`}>
       <label className="fl2">{label}</label>
@@ -498,7 +505,7 @@ async function submitLead(kind, data) {
 
 function useLeadForm(initial, validateFn, kind) {
   const [values, setValues] = useState(initial);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({nome: "", email: "", empresa: "", mensagem: "", whatsapp: ""});
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
 
   const bind = (name) => ({
@@ -625,7 +632,7 @@ function ShotEtapas() {
                   <TreeRow n={e.n} p={e.p} c={e.c} root sel={e.sel} />
                   {e.kids && (
                     <div className="t-kids">
-                      {e.kids.map(([n, p, c]) => <TreeRow key={n} n={n} p={p} c={c} />)}
+                      {e.kids.map(([n, p, c, root, sel]) => <TreeRow key={n} n={n} p={p} c={c} root={root} sel={sel} />)}
                     </div>
                   )}
                 </div>
@@ -946,7 +953,7 @@ function Modules() {
 const ACCESS_EMPTY = { nome: "", empresa: "", email: "", whatsapp: "", cidade: "", obras: "1 obra", controle: "Planilha Excel", equipe: "1 a 5", mensagem: "" };
 
 function validateAccess(v) {
-  const e = {};
+  const e = {nome: "", empresa: "", email: "", whatsapp: ""};
   if (v.nome.trim().length < 3) e.nome = "Informe seu nome.";
   if (v.empresa.trim().length < 2) e.empresa = "Informe a empresa.";
   if (!isEmail(v.email)) e.email = "E-mail inválido.";
@@ -1087,7 +1094,17 @@ function PageHero({ crumb, title, subtitle, onPage }) {
   );
 }
 
-function Channel({ icon, bg, title, text, href, cta }) {
+interface ChannelProps {
+  icon: ReactNode;
+  bg?: string;
+  title: string;
+  text: string;
+  href?: string;
+  cta?: string;
+}
+
+
+function Channel({ icon, bg, title, text, href, cta }: ChannelProps) {
   const external = href && href.startsWith("http");
   return (
     <div className="channel">
@@ -1175,7 +1192,7 @@ const ASSUNTOS = ["Quero conhecer o sistema", "Planos e valores", "Parceria", "I
 const CONTACT_EMPTY = { nome: "", email: "", empresa: "", assunto: ASSUNTOS[0], mensagem: "" };
 
 function validateContact(v) {
-  const e = {};
+  const e = {nome: "", email: "", mensagem: ""};
   if (v.nome.trim().length < 3) e.nome = "Informe seu nome.";
   if (!isEmail(v.email)) e.email = "E-mail inválido.";
   if (v.mensagem.trim().length < 10) e.mensagem = "Escreva ao menos algumas palavras.";
